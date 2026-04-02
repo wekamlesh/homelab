@@ -1,2 +1,10 @@
 .env
 *.local
+proxy/acme.json
+secrets/
+auth/secrets/*
+!auth/secrets/README.md
+!auth/secrets/users_database.example.yml
+auth/config/db.sqlite3
+auth/config/db.sqlite3-*
+auth/config/notification.txt

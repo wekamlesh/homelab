@@ -38,6 +38,9 @@ services:
       - "traefik.http.middlewares.traefik-root-redirect.redirectregex.regex=^https?://([^/]+)/$$"
       - "traefik.http.middlewares.traefik-root-redirect.redirectregex.replacement=https://$$1/dashboard/"
       - "traefik.http.middlewares.traefik-root-redirect.redirectregex.permanent=true"
+      # middleware auth
+      - "traefik.http.routers.traefik.middlewares=traefik-root-redirect@docker,authelia@docker"
+      - "traefik.http.routers.traefik.middlewares=traefik-root-redirect@docker"
 
     networks:
       - proxy-network

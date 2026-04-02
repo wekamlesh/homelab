@@ -1,5 +1,6 @@
 include:
   - proxy/compose.yml
+  - auth/compose.yml
 
 networks:
   proxy-network:

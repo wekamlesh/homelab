@@ -1,0 +1,45 @@
+theme: auto
+
+server:
+  address: tcp://0.0.0.0:9091
+  endpoints:
+    authz:
+      forward-auth:
+        implementation: ForwardAuth
+
+log:
+  level: info
+
+authentication_backend:
+  file:
+    path: /secrets/users_database.yml
+    watch: true
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain:
+        - 'home.{{ mustEnv "DOMAIN" }}'
+        - 'traefik.{{ mustEnv "DOMAIN" }}'
+        - 'metrics.{{ mustEnv "DOMAIN" }}'
+        - 'grafana.{{ mustEnv "DOMAIN" }}'
+        - 'alerts.{{ mustEnv "DOMAIN" }}'
+      policy: one_factor
+
+session:
+  redis:
+    host: redis
+    port: 6379
+  cookies:
+    - domain: '{{ mustEnv "DOMAIN" }}'
+      authelia_url: 'https://auth.{{ mustEnv "DOMAIN" }}'
+      default_redirection_url: 'https://home.{{ mustEnv "DOMAIN" }}'
+      same_site: lax
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
