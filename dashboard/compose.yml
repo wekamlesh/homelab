@@ -1,0 +1,24 @@
+services:
+  homarr:
+    image: ${HOMARR_IMAGE:-ghcr.io/homarr-labs/homarr:v1.44.0}
+    container_name: homarr
+    restart: unless-stopped
+    volumes:
+      - homarr-appdata:/appdata
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=${TZ:-Asia/Kolkata}
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_ENCRYPTION_KEY}
+      - BASE_URL=https://home.${DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homarr.rule=Host(`home.${DOMAIN}`)"
+      - "traefik.http.routers.homarr.entrypoints=websecure"
+      - "traefik.http.routers.homarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.homarr.middlewares=authelia@docker"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+    networks:
+      - proxy-network
+
+volumes:
+  homarr-appdata:
