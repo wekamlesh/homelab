@@ -1,0 +1,7 @@
+include:
+  - proxy/compose.yml
+
+networks:
+  proxy-network:
+    name: proxy-network
+    driver: bridge

@@ -1,0 +1,43 @@
+services:
+  traefik:
+    image: ${TRAEFIK_IMAGE:-traefik:v3.6}
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=${TZ}
+    command:
+      # Traefik Configuration
+      - --api=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy-network
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      # ACME Configuration
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.myresolver.acme.storage=/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+      # middlewares
+      - "traefik.http.middlewares.traefik-root-redirect.redirectregex.regex=^https?://([^/]+)/$$"
+      - "traefik.http.middlewares.traefik-root-redirect.redirectregex.replacement=https://$$1/dashboard/"
+      - "traefik.http.middlewares.traefik-root-redirect.redirectregex.permanent=true"
+
+    networks:
+      - proxy-network
