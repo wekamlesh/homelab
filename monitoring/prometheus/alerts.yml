@@ -1,0 +1,29 @@
+groups:
+  - name: infrastructure
+    rules:
+      - alert: PrometheusTargetMissing
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Target {{ $labels.instance }} is down"
+          description: "Prometheus has failed to scrape {{ $labels.job }} on {{ $labels.instance }} for more than 2 minutes."
+
+      - alert: BlackboxProbeFailed
+        expr: probe_success == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Probe failed for {{ $labels.instance }}"
+          description: "Blackbox Exporter has been unable to successfully probe {{ $labels.instance }} for more than 2 minutes."
+
+      - alert: BlackboxSlowProbe
+        expr: probe_duration_seconds > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Probe latency is high for {{ $labels.instance }}"
+          description: "Blackbox Exporter probe latency for {{ $labels.instance }} has been above 5 seconds for more than 5 minutes."

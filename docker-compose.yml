@@ -2,6 +2,7 @@ include:
   - proxy/compose.yml
   - auth/compose.yml
   - dashboard/compose.yml
+  - monitoring/compose.yml
 
 networks:
   proxy-network:
